@@ -1,14 +1,24 @@
 output "network_ids" {
-  description = "Map of network names to their IDs"
-  value       = { for k, v in unifi_network.this : k => v.id }
+  description = "Network names to IDs"
+  value       = local.network_ids
 }
 
-output "firewall_rule_ids" {
-  description = "List of firewall rule IDs"
-  value       = unifi_firewall_rule.this[*].id
+output "zone_ids" {
+  description = "Zone names (built-in and custom) to IDs"
+  value       = local.zone_ids
+}
+
+output "policy_ids" {
+  description = "Policy names to IDs"
+  value       = { for k, v in unifi_firewall_policy.this : k => v.id }
 }
 
 output "port_profile_ids" {
-  description = "Map of port profile names to their IDs"
+  description = "Port profile names to IDs"
   value       = { for k, v in unifi_port_profile.this : k => v.id }
+}
+
+output "device_port_ids" {
+  description = "Device port keys to IDs"
+  value       = { for k, v in unifi_device_port.this : k => v.id }
 }
