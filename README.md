@@ -2,13 +2,13 @@
 
 OpenTofu module for UniFi networks on the zone-based firewall (UniFi Network 9+):
 VLANs and DHCP, custom firewall zones, zone-based policies, switch port
-profiles and individual device ports.
+profiles and individual device ports, and client fixed IPs.
 
 ## Usage
 
 ```hcl
 module "network" {
-  source = "git::https://github.com/n2solutionsio/terraform-unifi-network.git?ref=v1.0.0"
+  source = "git::https://github.com/n2solutionsio/terraform-unifi-network.git?ref=v1.1.0"
 
   networks = {
     "Servers" = {
@@ -50,6 +50,10 @@ module "network" {
   also allow return traffic (`create_allow_respond`).
 - **Networks have `prevent_destroy`.** Deleting a network drops its clients;
   remove one deliberately with a `removed` block.
+- **Clients take over existing entries.** The controller already knows every
+  client it has seen, so `clients` adopts the entry by MAC
+  (`allow_existing`) instead of creating one, and removing an entry stops
+  managing the client without forgetting it (`skip_forget_on_destroy`).
 - **Adopting existing objects:** put `import` blocks in the root configuration
   (or the Terragrunt unit), keyed by name, e.g.
   `id = "name=Servers"` for `unifi_network.this["Servers"]`.

@@ -22,3 +22,8 @@ output "device_port_ids" {
   description = "Device port keys to IDs"
   value       = { for k, v in unifi_device_port.this : k => v.id }
 }
+
+output "client_ids" {
+  description = "Client names to IDs"
+  value       = { for k, v in unifi_client.this : k => v.id }
+}
