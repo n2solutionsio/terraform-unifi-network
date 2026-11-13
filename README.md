@@ -44,6 +44,12 @@ module "network" {
   `Internal`). Custom zones are created empty and ignore their own
   `network_ids`, so the two sides never fight. Moving a network between zones
   is a one-line change.
+- **Custom zones block traffic within themselves.** The controller's
+  defaults for a custom zone are Allow All to `External` and `Gateway`, and
+  Block All to every other zone, *including the same zone*. Two networks in
+  one custom zone can't reach each other until a policy with the same
+  `source_zone` and `destination_zone` allows it. Hosts in one network are
+  unaffected: that traffic is switched, not routed.
 - **Policy order can't be managed.** The controller appends each policy to the
   end of its zone pair, and the provider can't reorder them. Prefer `ALLOW`
   policies and let the zone defaults block everything else. `ALLOW` policies
