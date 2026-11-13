@@ -144,3 +144,19 @@ resource "unifi_device_port" "this" {
   tagged_networkconf_ids = each.value.tagged_networks != null ? toset([for n in each.value.tagged_networks : local.network_ids[n]]) : null
   port_profile_id        = each.value.port_profile != null ? unifi_port_profile.this[each.value.port_profile].id : null
 }
+
+# -----------------------------------------------------------------------------
+# Clients
+# -----------------------------------------------------------------------------
+
+resource "unifi_client" "this" {
+  for_each = var.clients
+
+  mac      = each.value.mac
+  name     = each.key
+  fixed_ip = each.value.fixed_ip
+  note     = each.value.note
+
+  allow_existing         = true
+  skip_forget_on_destroy = true
+}

@@ -139,3 +139,28 @@ variable "device_ports" {
     error_message = "tagged_vlan_mgmt must be auto, block_all or custom."
   }
 }
+
+variable "clients" {
+  description = <<-EOT
+    Known clients keyed by name, for fixed IPs (DHCP reservations). The
+    controller already knows every client it has seen, so these take over the
+    existing entry instead of creating one, and removing an entry stops
+    managing the client without forgetting it.
+  EOT
+  type = map(object({
+    mac      = string
+    fixed_ip = optional(string)
+    note     = optional(string)
+  }))
+  default = {}
+
+  validation {
+    condition     = alltrue([for k, v in var.clients : can(regex("^([0-9a-f]{2}:){5}[0-9a-f]{2}$", v.mac))])
+    error_message = "clients[*].mac must be a lowercase MAC address."
+  }
+
+  validation {
+    condition     = alltrue([for k, v in var.clients : v.fixed_ip == null || can(cidrhost("${v.fixed_ip}/32", 0))])
+    error_message = "clients[*].fixed_ip must be an IPv4 address."
+  }
+}

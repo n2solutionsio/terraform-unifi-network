@@ -129,6 +129,41 @@ run "device_ports" {
   }
 }
 
+run "clients" {
+  command = plan
+
+  variables {
+    clients = {
+      "Workstation" = {
+        mac      = "00:00:5e:00:53:02"
+        fixed_ip = "192.0.2.50"
+      }
+    }
+  }
+
+  assert {
+    condition = (
+      unifi_client.this["Workstation"].name == "Workstation" &&
+      unifi_client.this["Workstation"].fixed_ip == "192.0.2.50" &&
+      unifi_client.this["Workstation"].allow_existing &&
+      unifi_client.this["Workstation"].skip_forget_on_destroy
+    )
+    error_message = "Client takes over the existing entry by name and is never forgotten"
+  }
+}
+
+run "client_bad_mac_rejected" {
+  command = plan
+
+  variables {
+    clients = {
+      "Bad" = { mac = "00:00:5E:00:53:02" }
+    }
+  }
+
+  expect_failures = [var.clients]
+}
+
 run "unknown_zone_fails" {
   command = plan
 
