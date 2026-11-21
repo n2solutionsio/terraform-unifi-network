@@ -133,7 +133,7 @@ run "device_ports_custom_tagged" {
   command = plan
 
   override_data {
-    target = data.unifi_network.unmanaged["Default"]
+    target = data.unifi_network.unmanaged
     values = { id = "default-id" }
   }
 
