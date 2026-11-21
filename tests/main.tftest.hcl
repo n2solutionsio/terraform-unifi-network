@@ -129,6 +129,30 @@ run "device_ports" {
   }
 }
 
+run "device_ports_custom_tagged" {
+  command = plan
+
+  override_data {
+    target = data.unifi_network.unmanaged["Default"]
+    values = { id = "default-id" }
+  }
+
+  variables {
+    device_ports = {
+      "00:00:5e:00:53:01/5" = {
+        native_network   = "Alpha"
+        tagged_vlan_mgmt = "custom"
+        tagged_networks  = ["Beta"]
+      }
+    }
+  }
+
+  assert {
+    condition     = unifi_device_port.this["00:00:5e:00:53:01/5"].excluded_networkconf_ids == toset(["default-id"])
+    error_message = "Custom tagging excludes every network except the tagged and native ones"
+  }
+}
+
 run "clients" {
   command = plan
 
