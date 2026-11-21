@@ -5,12 +5,26 @@ locals {
   )
 
   network_ids = { for name, n in unifi_network.this : name => n.id }
+
+  # Every network the controller has, managed or not. A "custom" tagged port
+  # is stored by the controller as a list of excluded networks, so the
+  # module has to know them all to exclude everything but the tagged ones.
+  all_network_ids = merge(
+    { for name, n in data.unifi_network.unmanaged : name => n.id },
+    local.network_ids,
+  )
 }
 
 # -----------------------------------------------------------------------------
 # Zones. Built-in zones are looked up, never managed (#717: External can't be
 # updated). Custom zones are created empty; networks join them below.
 # -----------------------------------------------------------------------------
+
+data "unifi_network" "unmanaged" {
+  for_each = var.unmanaged_networks
+
+  name = each.key
+}
 
 data "unifi_firewall_zone" "builtin" {
   for_each = var.builtin_zones
@@ -136,13 +150,22 @@ resource "unifi_port_profile" "this" {
 resource "unifi_device_port" "this" {
   for_each = var.device_ports
 
-  device_mac             = split("/", each.key)[0]
-  index                  = tonumber(split("/", each.key)[1])
-  name                   = each.value.name
-  native_networkconf_id  = each.value.native_network != null ? local.network_ids[each.value.native_network] : null
-  tagged_vlan_mgmt       = each.value.tagged_vlan_mgmt
-  tagged_networkconf_ids = each.value.tagged_networks != null ? toset([for n in each.value.tagged_networks : local.network_ids[n]]) : null
-  port_profile_id        = each.value.port_profile != null ? unifi_port_profile.this[each.value.port_profile].id : null
+  device_mac            = split("/", each.key)[0]
+  index                 = tonumber(split("/", each.key)[1])
+  name                  = each.value.name
+  native_networkconf_id = each.value.native_network != null ? local.network_ids[each.value.native_network] : null
+  tagged_vlan_mgmt      = each.value.tagged_vlan_mgmt
+  port_profile_id       = each.value.port_profile != null ? unifi_port_profile.this[each.value.port_profile].id : null
+
+  # Network 9+ stores a "custom" tagged selection as the networks it
+  # excludes; setting tagged_networkconf_ids instead leaves every network
+  # tagged and the provider reports an inconsistent result. So tagged
+  # networks are written as "exclude everything else" (the native network
+  # is carried untagged and isn't excluded).
+  excluded_networkconf_ids = each.value.tagged_networks != null ? toset([
+    for name, id in local.all_network_ids : id
+    if !contains(each.value.tagged_networks, name) && name != each.value.native_network
+  ]) : null
 }
 
 # -----------------------------------------------------------------------------

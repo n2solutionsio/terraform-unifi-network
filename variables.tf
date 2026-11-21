@@ -33,6 +33,12 @@ variable "networks" {
   }
 }
 
+variable "unmanaged_networks" {
+  description = "Networks on the controller that this module doesn't manage (e.g. the built-in Default LAN). Read by name so `device_ports` tagged selections can exclude them."
+  type        = set(string)
+  default     = ["Default"]
+}
+
 variable "builtin_zones" {
   description = "Controller built-in firewall zones to look up by name. They are read, never managed."
   type        = set(string)

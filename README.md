@@ -60,6 +60,10 @@ module "network" {
   client it has seen, so `clients` adopts the entry by MAC
   (`allow_existing`) instead of creating one, and removing an entry stops
   managing the client without forgetting it (`skip_forget_on_destroy`).
+- **Custom tagged ports:** UniFi Network 9+ stores a "custom" tagged
+  selection as the networks a port *excludes*. `device_ports[*].tagged_networks`
+  is therefore written as "exclude every other network", which is why the
+  module reads `unmanaged_networks` (default `Default`) by name.
 - **Adopting existing objects:** put `import` blocks in the root configuration
   (or the Terragrunt unit), keyed by name, e.g.
   `id = "name=Servers"` for `unifi_network.this["Servers"]`.
