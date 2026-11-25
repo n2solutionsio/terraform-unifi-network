@@ -124,7 +124,8 @@ variable "device_ports" {
   description = <<-EOT
     Individual switch or gateway ports keyed by "<device_mac>/<index>".
     Network references are names from `networks`. Unset fields keep the
-    controller's current value.
+    controller's current value. `forward = "disabled"` turns an unused port
+    off.
   EOT
   type = map(object({
     name             = optional(string)
@@ -132,6 +133,7 @@ variable "device_ports" {
     tagged_vlan_mgmt = optional(string)
     tagged_networks  = optional(list(string))
     port_profile     = optional(string)
+    forward          = optional(string)
   }))
   default = {}
 
@@ -143,6 +145,11 @@ variable "device_ports" {
   validation {
     condition     = alltrue([for k, v in var.device_ports : v.tagged_vlan_mgmt == null || contains(["auto", "block_all", "custom"], v.tagged_vlan_mgmt)])
     error_message = "tagged_vlan_mgmt must be auto, block_all or custom."
+  }
+
+  validation {
+    condition     = alltrue([for k, v in var.device_ports : v.forward == null || contains(["all", "native", "customize", "disabled"], v.forward)])
+    error_message = "forward must be all, native, customize or disabled."
   }
 }
 

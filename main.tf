@@ -156,6 +156,7 @@ resource "unifi_device_port" "this" {
   native_networkconf_id = each.value.native_network != null ? local.network_ids[each.value.native_network] : null
   tagged_vlan_mgmt      = each.value.tagged_vlan_mgmt
   port_profile_id       = each.value.port_profile != null ? unifi_port_profile.this[each.value.port_profile].id : null
+  forward               = each.value.forward
 
   # Network 9+ stores a "custom" tagged selection as the networks it
   # excludes; setting tagged_networkconf_ids instead leaves every network

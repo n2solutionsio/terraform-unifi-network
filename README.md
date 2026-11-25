@@ -64,6 +64,8 @@ module "network" {
   selection as the networks a port *excludes*. `device_ports[*].tagged_networks`
   is therefore written as "exclude every other network", which is why the
   module reads `unmanaged_networks` (default `Default`) by name.
+- **Unused ports:** set `device_ports[*].forward = "disabled"` to turn a
+  port off; it stays in code with its name, so re-enabling is a one-line change.
 - **Adopting existing objects:** put `import` blocks in the root configuration
   (or the Terragrunt unit), keyed by name, e.g.
   `id = "name=Servers"` for `unifi_network.this["Servers"]`.

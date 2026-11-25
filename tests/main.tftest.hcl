@@ -153,6 +153,38 @@ run "device_ports_custom_tagged" {
   }
 }
 
+run "device_ports_disabled" {
+  command = plan
+
+  variables {
+    device_ports = {
+      "00:00:5e:00:53:01/7" = {
+        name    = "unused"
+        forward = "disabled"
+      }
+    }
+  }
+
+  assert {
+    condition     = unifi_device_port.this["00:00:5e:00:53:01/7"].forward == "disabled"
+    error_message = "forward is passed through to the port"
+  }
+}
+
+run "device_ports_forward_invalid" {
+  command = plan
+
+  variables {
+    device_ports = {
+      "00:00:5e:00:53:01/7" = {
+        forward = "off"
+      }
+    }
+  }
+
+  expect_failures = [var.device_ports]
+}
+
 run "clients" {
   command = plan
 
