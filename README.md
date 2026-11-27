@@ -63,7 +63,9 @@ module "network" {
 - **Custom tagged ports:** UniFi Network 9+ stores a "custom" tagged
   selection as the networks a port *excludes*. `device_ports[*].tagged_networks`
   is therefore written as "exclude every other network", which is why the
-  module reads `unmanaged_networks` (default `Default`) by name.
+  module reads `unmanaged_networks` (default `Default`) by name. Those
+  names also work as a port's `native_network`, for an access port on the
+  built-in Default LAN.
 - **Adopting existing objects:** put `import` blocks in the root configuration
   (or the Terragrunt unit), keyed by name, e.g.
   `id = "name=Servers"` for `unifi_network.this["Servers"]`.

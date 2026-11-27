@@ -123,7 +123,8 @@ variable "port_profiles" {
 variable "device_ports" {
   description = <<-EOT
     Individual switch or gateway ports keyed by "<device_mac>/<index>".
-    Network references are names from `networks`. Unset fields keep the
+    Network references are names from `networks` or `unmanaged_networks`
+    (e.g. an access port on the built-in Default LAN). Unset fields keep the
     controller's current value.
   EOT
   type = map(object({
