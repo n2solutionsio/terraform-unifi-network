@@ -153,7 +153,7 @@ resource "unifi_device_port" "this" {
   device_mac            = split("/", each.key)[0]
   index                 = tonumber(split("/", each.key)[1])
   name                  = each.value.name
-  native_networkconf_id = each.value.native_network != null ? local.network_ids[each.value.native_network] : null
+  native_networkconf_id = each.value.native_network != null ? local.all_network_ids[each.value.native_network] : null
   tagged_vlan_mgmt      = each.value.tagged_vlan_mgmt
   port_profile_id       = each.value.port_profile != null ? unifi_port_profile.this[each.value.port_profile].id : null
 

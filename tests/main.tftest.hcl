@@ -153,6 +153,29 @@ run "device_ports_custom_tagged" {
   }
 }
 
+run "device_ports_unmanaged_native" {
+  command = plan
+
+  override_data {
+    target = data.unifi_network.unmanaged
+    values = { id = "default-id" }
+  }
+
+  variables {
+    device_ports = {
+      "00:00:5e:00:53:02/2" = {
+        native_network   = "Default"
+        tagged_vlan_mgmt = "block_all"
+      }
+    }
+  }
+
+  assert {
+    condition     = unifi_device_port.this["00:00:5e:00:53:02/2"].native_networkconf_id == "default-id"
+    error_message = "A native network can be an unmanaged one (the Default LAN)"
+  }
+}
+
 run "clients" {
   command = plan
 
